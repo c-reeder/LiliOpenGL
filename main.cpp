@@ -18,11 +18,14 @@ unsigned int loadTexture(char const * path);
 float screenWidth = 800.0f;
 float screenHeight = 600.0f;
 
+float spriteHeight = 250.0f / 2.0f;
+float spriteWidth = 400.0f / 2.0f;
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 glm::mat4 projection = glm::ortho(0.0f, screenWidth, screenHeight, 0.0f, -1.0f, 1.0f);  
-glm::vec2 position(0.0f, 3.0f * (screenHeight / 4.0f) - 250.0f);
+glm::vec2 position(0.0f, 3.0f * (screenHeight / 4.0f) - spriteHeight);
 
 int main()
 {
@@ -52,7 +55,12 @@ int main()
 
 	Shader spriteShader("spriteVert.glsl", "spriteFrag.glsl");
 
-    GLfloat vertices[] = { 
+	float texWide = screenWidth / 32.0f;
+	float texHigh = (screenHeight / 4.0f) / 32.0f;
+
+	printf("texWide: %f, texHigh: %f\n", texWide, texHigh);
+
+    GLfloat spriteVertices[] = { 
         // Pos      // Tex
         0.0f, 1.0f, 0.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f,
@@ -63,22 +71,47 @@ int main()
         1.0f, 0.0f, 1.0f, 0.0f
     };
 
-	// Create Vertex Buffer Object
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
-			vertices, GL_STATIC_DRAW);
+	GLfloat grassVertices[] = {
+        // Pos      // Tex
+        0.0f, 1.0f, 0.0f, texHigh,
+        1.0f, 0.0f, texWide, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f, 
+    
+        0.0f, 1.0f, 0.0f, texHigh,
+        1.0f, 1.0f, texWide, texHigh,
+        1.0f, 0.0f, texWide, 0.0f
+	};
 
-	// Create/Setup Box VAO
+	// Create Vertex Buffer Objects
+	unsigned int spriteVBO;
+	glGenBuffers(1, &spriteVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, spriteVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(spriteVertices),
+			spriteVertices, GL_STATIC_DRAW);
+	unsigned int grassVBO;
+	glGenBuffers(1, &grassVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(grassVertices),
+			grassVertices, GL_STATIC_DRAW);
+
+	// Create/Setup VAOs
 	unsigned int spriteVAO;
 	glGenVertexArrays(1, &spriteVAO);
 	glBindVertexArray(spriteVAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, spriteVBO);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 
+	unsigned int grassVAO;
+	glGenVertexArrays(1, &grassVAO);
+	glBindVertexArray(grassVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+
+	// Load Textures
 	int spriteTextures[4];
 	spriteTextures[0] = loadTexture("res/LiliRunRight/lilirunright1.png");
 	spriteTextures[1] = loadTexture("res/LiliRunRight/lilirunright2.png");
@@ -128,7 +161,7 @@ int main()
 		// Create model matrix
 		glm::mat4 spriteModel;
 		spriteModel = glm::translate(spriteModel, glm::vec3(position, 0.0f));
-		spriteModel = glm::scale(spriteModel, glm::vec3(400.0f, 250.0f, 1.0f));
+		spriteModel = glm::scale(spriteModel, glm::vec3(spriteWidth, spriteHeight, 1.0f));
 
 		// Send sprite transformation matrices to Graphics Card
 		spriteShader.setMatrix4fv("model", spriteModel);
@@ -141,6 +174,9 @@ int main()
 
 		glm::mat4 grassModel;
 		grassModel = glm::translate(grassModel, glm::vec3(0.0f, 3.0f * (screenHeight / 4.0f), 0.0f));
+		//grassModel = glm::scale(grassModel,
+				//glm::vec3(screenWidth, (screenHeight / 4.0f),
+					//1.0f));
 		grassModel = glm::scale(grassModel,
 				glm::vec3(screenWidth, (screenHeight / 4.0f),
 					1.0f));
@@ -150,7 +186,7 @@ int main()
 		spriteShader.set1i("image", 1);
 
 		// Draw Grass
-		glBindVertexArray(spriteVAO);
+		glBindVertexArray(grassVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		glfwPollEvents();
@@ -201,8 +237,8 @@ unsigned int loadTexture(char const * path)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
