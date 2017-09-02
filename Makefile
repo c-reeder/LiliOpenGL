@@ -11,7 +11,6 @@ default: $(NAME)
 
 $(NAME): main.cpp $(OBJS) $(SHADERS)
 	$(CXX) $(CPPFLAGS) -o $(NAME) $(LDLIBS) $(OBJS) main.cpp
-	./liliOpenGL
 
 $(ODIR)/Shader.o: Shader.cpp Shader.hpp
 	$(CXX) $(CPPFLAGS) -c Shader.cpp -o $@

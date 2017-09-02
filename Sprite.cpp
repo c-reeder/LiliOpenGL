@@ -23,9 +23,10 @@ float Sprite::vertices[] = {
 	1.0f, 0.0f, 1.0f, 0.0f
 };
 
-Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f)
+Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f), width(400.0f), height(250.0f), lastTextureIdx(0)
 {
 	this->textureUnit = textureUnit;
+	printf("Init Sprite with textureUnit: %d\n", textureUnit);
 
 	// Create Vertex Buffer Object
 	unsigned int VBO;
@@ -48,14 +49,21 @@ Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), 
 	textures[3] = loadTexture("res/LiliRunRight/lilirunright4.png");
 
 
+	int activeUnit = GL_TEXTURE0 + textureUnit;
+	printf("first activeUnit: %d, lastTextureIdx: %d, textures[lastTextureIdx]: %d\n", activeUnit, lastTextureIdx, textures[lastTextureIdx]);
+	glActiveTexture(activeUnit);
+	glBindTexture(GL_TEXTURE_2D, textures[lastTextureIdx]);
 }
 
 void Sprite::draw(glm::mat4 projection)
 {
 	float currentFrame = glfwGetTime();
 
+		//printf("currentFrame: %f, lastTextureSwitch: %f\n", currentFrame, lastTextureSwitch);
 	if (currentFrame - lastTextureSwitch > 0.15f) {
-		glActiveTexture(GL_TEXTURE0 + textureUnit);
+		int activeUnit = GL_TEXTURE0 + textureUnit;
+		printf("activeUnit: %d, lastTextureIdx: %d, textures[lastTextureIdx]: %d\n", activeUnit, lastTextureIdx, textures[lastTextureIdx]);
+		glActiveTexture(activeUnit);
 		lastTextureIdx = (lastTextureIdx + 1) % 4;
 		glBindTexture(GL_TEXTURE_2D, textures[lastTextureIdx]);
 		lastTextureSwitch = currentFrame;
