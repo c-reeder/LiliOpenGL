@@ -38,7 +38,7 @@ int main()
 
 
 	GLFWwindow* window =
-		glfwCreateWindow(screenWidth,screenHeight,"LearnOpenGL", NULL,NULL);
+		glfwCreateWindow(screenWidth,screenHeight,"Lili Game", NULL,NULL);
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -53,7 +53,7 @@ int main()
 	glViewport(0,0,screenWidth,screenHeight);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	Shader spriteShader("spriteVert.glsl", "spriteFrag.glsl");
+	Shader grassShader("spriteVert.glsl", "spriteFrag.glsl");
 
 	// Initialize Sprite
 	sprite = new Sprite(0);
@@ -95,8 +95,6 @@ int main()
 	glEnableVertexAttribArray(0);
 
 	// Load Textures
-	int grassTexture = loadTexture("res/grass.png");
-	printf("grassTexture: %d\n", grassTexture);
 
 	/**
 	 * Textures
@@ -107,6 +105,7 @@ int main()
 	 */
 
 	glActiveTexture(GL_TEXTURE1);
+	int grassTexture = loadTexture("res/grass.png");
 	glBindTexture(GL_TEXTURE_2D, grassTexture);
 
 	while(!glfwWindowShouldClose(window))
@@ -120,6 +119,7 @@ int main()
 		glClearColor(0.82f, 0.52f, 0.93f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		grassShader.use();
 
 		glm::mat4 grassModel;
 		grassModel = glm::translate(grassModel, glm::vec3(0.0f, 3.0f * (screenHeight / 4.0f), 0.0f));
@@ -127,9 +127,9 @@ int main()
 				glm::vec3(screenWidth, (screenHeight / 4.0f),
 					1.0f));
 
-		spriteShader.setMatrix4fv("model", grassModel);
-		spriteShader.setMatrix4fv("projection", projection);
-		spriteShader.set1i("image", 1);
+		grassShader.setMatrix4fv("model", grassModel);
+		grassShader.setMatrix4fv("projection", projection);
+		grassShader.set1i("image", 1);
 
 		// Draw Grass
 		glBindVertexArray(grassVAO);
