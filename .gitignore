@@ -1,0 +1,8 @@
+# Generated Object Files
+objs/
+
+# Application Binary
+liliOpenGL
+
+# YCM config file
+.ycm_extra_conf.py
