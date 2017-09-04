@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Game.hpp"
 #include "Object.hpp"
+#include "Camera_2D.hpp"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ float screenHeight = 600.0f;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-glm::mat4 projection = glm::ortho(0.0f, screenWidth, screenHeight, 0.0f, -1.0f, 1.0f);  
+Camera_2D camera(screenHeight, screenHeight);
 
 Sprite* sprite = NULL;
 Object* cloud = NULL;
@@ -142,15 +143,16 @@ int main()
 					1.0f));
 
 		grassShader.setMatrix4fv("model", grassModel);
-		grassShader.setMatrix4fv("projection", projection);
+		grassShader.setMatrix4fv("projection",
+				camera.getProjectionMatrix());
 		grassShader.set1i("image", 1);
 
 		// Draw Grass
 		glBindVertexArray(grassVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		sprite->draw(projection, gameState);
-		cloud->draw(projection);
+		sprite->draw(camera.getProjectionMatrix(), gameState);
+		cloud->draw(camera.getProjectionMatrix());
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -166,7 +168,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0,0,width, height);
 	screenWidth = width;
 	screenHeight = height;
-	projection = glm::ortho(0.0f, (float) width, (float) height, 0.0f, -1.0f, 1.0f);
+	camera.setSize(width, height);
 }
 
 void processInput(GLFWwindow *window)

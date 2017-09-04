@@ -10,6 +10,9 @@ class Camera_2D
 		float displayWidth;
 		float displayHeight;
 
+
+		void setSize(int width, int height);
+
 		glm::mat4 getViewMatrix();
 		glm::mat4 getProjectionMatrix();
 	private:
