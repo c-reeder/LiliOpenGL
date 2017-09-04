@@ -5,18 +5,20 @@
 #define SPRITE_H
 #include "Shader.hpp"
 #include "Game.hpp"
+#include "Camera_2D.hpp"
 
 class Sprite
 {
 	public:
-		Sprite(int textureUnit);
-		void draw(glm::mat4 projection, Game_State state);
+		Sprite(Camera_2D* camera, int textureUnit);
+		void draw(Game_State state);
 
 		float height;
 		float width;
 		glm::vec2 position;
 
 	private:
+		Camera_2D* camera;
 		Shader shader;
 		unsigned int VAO;
 		int textureUnit;

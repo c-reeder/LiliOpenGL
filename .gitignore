@@ -6,3 +6,6 @@ liliOpenGL
 
 # YCM config file
 .ycm_extra_conf.py
+
+# Image Project Files
+rawImgs

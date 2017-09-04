@@ -9,6 +9,7 @@
 #include "Sprite.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Camera_2D.hpp"
 
 static unsigned int loadTexture(char const * path);
 
@@ -23,8 +24,9 @@ float Sprite::vertices[] = {
 	1.0f, 0.0f, 1.0f, 0.0f
 };
 
-Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f), width(400.0f), height(250.0f), lastTextureIdx(0)
+Sprite::Sprite(Camera_2D* camera, int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f), width(400.0f), height(250.0f), lastTextureIdx(0), lastTextureSwitch(-0.15f)
 {
+	this->camera = camera;
 	this->textureUnit = textureUnit;
 
 	// Create Vertex Buffer Object
@@ -54,7 +56,7 @@ Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), 
 	shader.use();
 }
 
-void Sprite::draw(glm::mat4 projection, Game_State state)
+void Sprite::draw(Game_State state)
 {
 	float currentFrame = glfwGetTime();
 	shader.use();
@@ -66,6 +68,8 @@ void Sprite::draw(glm::mat4 projection, Game_State state)
 		lastTextureIdx = (lastTextureIdx + 1) % 4;
 		glBindTexture(GL_TEXTURE_2D, textures[lastTextureIdx]);
 		lastTextureSwitch = currentFrame;
+	} else if (currentFrame < lastTextureSwitch) {
+		std::cerr << "WHOAAA!!!" << std::endl;
 	}
 
 	shader.use();
@@ -76,7 +80,8 @@ void Sprite::draw(glm::mat4 projection, Game_State state)
 
 
 	shader.setMatrix4fv("model", model);
-	shader.setMatrix4fv("projection", projection);
+	shader.setMatrix4fv("view", camera->getViewMatrix());
+	shader.setMatrix4fv("projection", camera->getProjectionMatrix());
 	shader.set1i("image", textureUnit);
 
 	glBindVertexArray(VAO);

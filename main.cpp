@@ -64,14 +64,14 @@ int main()
 	gameState = FW;
 
 	// Initialize Sprite
-	sprite = new Sprite(0);
+	sprite = new Sprite(&camera, 0);
 	sprite->height = 250.0f / 2.0f;
 	sprite->width = 400.0f / 2.0f;
 	sprite->position = 
 		glm::vec2(0.0f, 3.0f * (screenHeight / 4.0f) - sprite->height);
 
 	// Initialize Clouds
-	cloud = new Object("res/cloud.png", 2);
+	cloud = new Object(&camera, "res/cloud.png", 2);
 	cloud->height = 250.0f / 2.0f;
 	cloud->width = 400.0f / 2.0f;
 	cloud->position.x = 200.0f;
@@ -143,6 +143,7 @@ int main()
 					1.0f));
 
 		grassShader.setMatrix4fv("model", grassModel);
+		grassShader.setMatrix4fv("view", camera.getViewMatrix());
 		grassShader.setMatrix4fv("projection",
 				camera.getProjectionMatrix());
 		grassShader.set1i("image", 1);
@@ -151,8 +152,8 @@ int main()
 		glBindVertexArray(grassVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		sprite->draw(camera.getProjectionMatrix(), gameState);
-		cloud->draw(camera.getProjectionMatrix());
+		sprite->draw(gameState);
+		cloud->draw();
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);

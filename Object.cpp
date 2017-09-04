@@ -23,8 +23,9 @@ float Object::vertices[] = {
 	1.0f, 0.0f, 1.0f, 0.0f
 };
 
-Object::Object(char const* imagePath, int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f) 
+Object::Object(Camera_2D* camera, char const* imagePath, int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f) 
 {
+	this->camera = camera;
 	this->textureUnit = textureUnit;
 
 	// Create Vertex Buffer Object
@@ -56,7 +57,7 @@ Object::Object(char const* imagePath, int textureUnit) : shader("spriteVert.glsl
 	shader.use();
 }
 
-void Object::draw(glm::mat4 projection)
+void Object::draw()
 {
 	float currentFrame = glfwGetTime();
 	shader.use();
@@ -72,7 +73,8 @@ void Object::draw(glm::mat4 projection)
 
 
 	shader.setMatrix4fv("model", model);
-	shader.setMatrix4fv("projection", projection);
+	shader.setMatrix4fv("view", camera->getViewMatrix());
+	shader.setMatrix4fv("projection", camera->getProjectionMatrix());
 	shader.set1i("image", textureUnit);
 
 	glBindVertexArray(VAO);
