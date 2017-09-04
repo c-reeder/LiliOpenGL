@@ -1,7 +1,7 @@
 #include "Camera_2D.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera_2D::Camera_2D(float displayWidth, float displayHeight)
+Camera_2D::Camera_2D(float displayWidth, float displayHeight) : xpos(0.0f)
 {
 	this->displayWidth = displayWidth;
 	this->displayHeight = displayHeight;
@@ -16,6 +16,8 @@ void Camera_2D::setSize(int width, int height)
 
 glm::mat4 Camera_2D::getViewMatrix()
 {
+	glm::mat4 viewMatrix;
+	viewMatrix = glm::translate(viewMatrix, glm::vec3(xpos, 0.0f, 0.0f));
 	return viewMatrix;
 }
 glm::mat4 Camera_2D::getProjectionMatrix()

@@ -123,11 +123,14 @@ int main()
 	int grassTexture = loadTexture("res/grass.png");
 	glBindTexture(GL_TEXTURE_2D, grassTexture);
 
+
+
 	while(!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
 
 		processInput(window);
 
@@ -143,7 +146,8 @@ int main()
 					1.0f));
 
 		grassShader.setMatrix4fv("model", grassModel);
-		grassShader.setMatrix4fv("view", camera.getViewMatrix());
+		glm::mat4 stationaryView;
+		grassShader.setMatrix4fv("view", stationaryView);
 		grassShader.setMatrix4fv("projection",
 				camera.getProjectionMatrix());
 		grassShader.set1i("image", 1);
