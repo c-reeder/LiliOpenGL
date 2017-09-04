@@ -3,7 +3,7 @@ CXX=g++
 CPPFLAGS=-std=c++11 -g
 LDLIBS=-lglfw -lGLEW -lGL -lSOIL
 ODIR=objs
-TOOLS=Shader Sprite
+TOOLS=Shader Sprite Object
 OBJS=$(TOOLS:%=$(ODIR)/%.o)
 SHADERS=spriteVert.glsl spriteFrag.glsl
 
@@ -17,6 +17,9 @@ $(ODIR)/Shader.o: Shader.cpp Shader.hpp
 
 $(ODIR)/Sprite.o: Sprite.cpp Sprite.hpp
 	$(CXX) $(CPPFLAGS) -c Sprite.cpp -o $@
+
+$(ODIR)/Object.o: Object.cpp Object.hpp
+	$(CXX) $(CPPFLAGS) -c Object.cpp -o $@
 
 clean: 
 	rm $(ODIR)/*

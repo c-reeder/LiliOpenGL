@@ -8,7 +8,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include "Game.hpp"
+#include "Object.hpp"
 
 using namespace std;
 
@@ -26,6 +27,10 @@ float lastFrame = 0.0f;
 glm::mat4 projection = glm::ortho(0.0f, screenWidth, screenHeight, 0.0f, -1.0f, 1.0f);  
 
 Sprite* sprite = NULL;
+Object* cloud = NULL;
+
+
+Game_State gameState;
 
 int main()
 {
@@ -55,6 +60,8 @@ int main()
 
 	Shader grassShader("spriteVert.glsl", "spriteFrag.glsl");
 
+	gameState = FW;
+
 	// Initialize Sprite
 	sprite = new Sprite(0);
 	sprite->height = 250.0f / 2.0f;
@@ -62,10 +69,17 @@ int main()
 	sprite->position = 
 		glm::vec2(0.0f, 3.0f * (screenHeight / 4.0f) - sprite->height);
 
+	// Initialize Clouds
+	cloud = new Object("res/cloud.png", 2);
+	cloud->height = 250.0f / 2.0f;
+	cloud->width = 400.0f / 2.0f;
+	cloud->position.x = 200.0f;
+
+
 	float texWide = screenWidth / 32.0f;
 	float texHigh = (screenHeight / 4.0f) / 32.0f;
 
-	printf("texWide: %f, texHigh: %f\n", texWide, texHigh);
+	//printf("texWide: %f, texHigh: %f\n", texWide, texHigh);
 
 	GLfloat grassVertices[] = {
         // Pos      // Tex
@@ -135,7 +149,8 @@ int main()
 		glBindVertexArray(grassVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		sprite->draw(projection);
+		sprite->draw(projection, gameState);
+		cloud->draw(projection);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);

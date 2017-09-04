@@ -1,18 +1,18 @@
 /**
- * A class which represents a single sprite (character) within the game.
+ * A class which represents a single object within the game.
  */
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Shader.hpp"
 #include <SOIL/SOIL.h>
-#include "Sprite.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Object.hpp"
 
-static unsigned int loadTexture(char const * path);
+static unsigned int loadTexture(char const * path, int* imgWidth, int* imgHeight);
 
-float Sprite::vertices[] = { 
+float Object::vertices[] = { 
 	// Pos      // Tex
 	0.0f, 1.0f, 0.0f, 1.0f,
 	1.0f, 0.0f, 1.0f, 0.0f,
@@ -23,7 +23,7 @@ float Sprite::vertices[] = {
 	1.0f, 0.0f, 1.0f, 0.0f
 };
 
-Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f), width(400.0f), height(250.0f), lastTextureIdx(0)
+Object::Object(char const* imagePath, int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f) 
 {
 	this->textureUnit = textureUnit;
 
@@ -31,8 +31,8 @@ Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), 
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
-			vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Object::vertices),
+			Object::vertices, GL_STATIC_DRAW);
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &VAO);
@@ -41,34 +41,30 @@ Sprite::Sprite(int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	// Load Textures
-	textures[0] = loadTexture("res/LiliRunRight/lilirunright1.png");
-	textures[1] = loadTexture("res/LiliRunRight/lilirunright2.png");
-	textures[2] = loadTexture("res/LiliRunRight/lilirunright3.png");
-	textures[3] = loadTexture("res/LiliRunRight/lilirunright4.png");
+	// Load Image Texture
+	int imgWidth;
+	int imgHeight;
+	texture = loadTexture(imagePath, &imgWidth, &imgHeight);
 
+	// Set Default dimmensions of Object to the dimensions of image
+	this->width = imgWidth;
+	this->height = imgHeight;
 
 	int activeUnit = GL_TEXTURE0 + textureUnit;
 	glActiveTexture(activeUnit);
-	glBindTexture(GL_TEXTURE_2D, textures[lastTextureIdx]);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	shader.use();
 }
 
-void Sprite::draw(glm::mat4 projection, Game_State state)
+void Object::draw(glm::mat4 projection)
 {
 	float currentFrame = glfwGetTime();
 	shader.use();
 
-		//printf("currentFrame: %f, lastTextureSwitch: %f\n", currentFrame, lastTextureSwitch);
-	if (currentFrame - lastTextureSwitch > 0.15f) {
-		int activeUnit = GL_TEXTURE0 + textureUnit;
-		glActiveTexture(activeUnit);
-		lastTextureIdx = (lastTextureIdx + 1) % 4;
-		glBindTexture(GL_TEXTURE_2D, textures[lastTextureIdx]);
-		lastTextureSwitch = currentFrame;
-	}
-
-	shader.use();
+	// Activate Texture
+	int activeUnit = GL_TEXTURE0 + textureUnit;
+	glActiveTexture(activeUnit);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glm::mat4 model;
 	model = glm::translate(model, glm::vec3(position, 0.0f));
@@ -85,21 +81,22 @@ void Sprite::draw(glm::mat4 projection, Game_State state)
 }
 
 
-static unsigned int loadTexture(char const * path)
+static unsigned int loadTexture(char const * path, int* imgWidth, int* imgHeight)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
-	int width, height;
 	unsigned char* data = SOIL_load_image(path,
-			&width, &height, 0, SOIL_LOAD_RGBA);
+			imgWidth, imgHeight, 0, SOIL_LOAD_RGBA);
 	if( 0 == data )
 	{
 		printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
 	}
 
+
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *imgWidth, *imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
