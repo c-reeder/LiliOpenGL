@@ -25,7 +25,7 @@ float screenHeight = 600.0f;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-Camera_2D camera(screenHeight, screenHeight);
+Camera_2D camera(screenWidth, screenHeight);
 
 Sprite* sprite = NULL;
 Object* cloud = NULL;
