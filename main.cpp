@@ -21,6 +21,8 @@ unsigned int loadTexture(char const * path);
 float screenWidth = 800.0f;
 float screenHeight = 600.0f;
 
+float levelLength = screenWidth * 20; // 16,000 for now
+
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -28,7 +30,7 @@ float lastFrame = 0.0f;
 Camera_2D camera(screenWidth, screenHeight);
 
 Sprite* sprite = NULL;
-Object* cloud = NULL;
+Object* clouds[5];
 
 
 Game_State gameState;
@@ -71,10 +73,19 @@ int main()
 		glm::vec2(0.0f, 3.0f * (screenHeight / 4.0f) - sprite->height);
 
 	// Initialize Clouds
-	cloud = new Object(&camera, "res/cloud.png", 2);
-	cloud->height = 250.0f / 2.0f;
-	cloud->width = 400.0f / 2.0f;
-	cloud->position.x = 200.0f;
+	for (int i = 0; i < 5; i++)
+	{
+
+		clouds[i] = new Object(&camera, "res/cloud.png", 2);
+		clouds[i]->height = 250.0f / 2.0f;
+		clouds[i]->width = 400.0f / 2.0f;
+		clouds[i]->position.x = i * 300.0f;
+
+	}
+	//cloud = new Object(&camera, "res/cloud.png", 2);
+	//cloud->height = 250.0f / 2.0f;
+	//cloud->width = 400.0f / 2.0f;
+	//cloud->position.x = 200.0f;
 
 
 	float texWide = screenWidth / 32.0f;
@@ -157,7 +168,11 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		sprite->draw(gameState);
-		cloud->draw();
+		for (int i = 0; i < 5; i++)
+		{
+			clouds[i]->draw();
+		}
+		//cloud->draw();
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
