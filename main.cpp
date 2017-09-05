@@ -25,6 +25,7 @@ float levelLength = screenWidth * 20; // 16,000 for now
 
 
 float deltaTime = 0.0f;
+float deltaPos = 0.0f;
 float lastFrame = 0.0f;
 
 Camera_2D camera(screenWidth, screenHeight);
@@ -136,6 +137,7 @@ int main()
 
 
 
+	//camera.xpos = 435.0f;
 	while(!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -148,24 +150,60 @@ int main()
 		glClearColor(0.82f, 0.52f, 0.93f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		/**
+		 *
+		 * Add static Grass
+		 *
+		 */
 		grassShader.use();
-
+		// Setup Grass Model Matrix
 		glm::mat4 grassModel;
 		grassModel = glm::translate(grassModel, glm::vec3(0.0f, 3.0f * (screenHeight / 4.0f), 0.0f));
 		grassModel = glm::scale(grassModel,
 				glm::vec3(screenWidth, (screenHeight / 4.0f),
 					1.0f));
-
+		// Send Grass transform matrices
 		grassShader.setMatrix4fv("model", grassModel);
 		glm::mat4 stationaryView;
 		grassShader.setMatrix4fv("view", stationaryView);
 		grassShader.setMatrix4fv("projection",
 				camera.getProjectionMatrix());
 		grassShader.set1i("image", 1);
-
 		// Draw Grass
 		glBindVertexArray(grassVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// Update Game State
+		//if (gameState == BW && rightBarrier)
+		//{
+			//printf("Now going forward!\n");
+			//gameState = FW;
+		//} else if (FW && leftBarrier)
+		//{
+			//printf("Now going backward!\n");
+			//gameState = BW;
+		//}
+		
+		// Update Camera Position
+		if (gameState == BW)
+		{
+			if (camera.xpos - sprite->position.x > deltaPos * 2) {
+				camera.xpos = max(camera.xpos - 3000 * deltaTime,
+						sprite->position.x);
+			} else if (camera.xpos - sprite->position.x > 0) {
+				camera.xpos = sprite->position.x;
+			}
+		} else if (gameState == FW)
+		{
+			if (sprite->position.x - camera.xpos > deltaPos * 2) {
+				camera.xpos = min(3000 * deltaTime + camera.xpos,
+						sprite->position.x);
+			} else if (sprite->position.x - camera.xpos > 0) {
+				camera.xpos = sprite->position.x;
+			}
+		} else {
+			cerr << "Unknown game state!!!\n" << endl;
+		}
 
 		sprite->draw(gameState);
 		for (int i = 0; i < 5; i++)
@@ -201,10 +239,13 @@ void processInput(GLFWwindow *window)
 		//position.y -= deltaTime * 1000;
 	//if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		//position.y += deltaTime * 1000;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		sprite->position.x -= deltaTime * 1000;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		sprite->position.x += deltaTime * 1000;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
+		deltaPos = -1000.0f * deltaTime;
+	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		deltaPos = 1000.0f * deltaTime;
+	else
+		deltaPos = 0.0f;
+	sprite->position.x += deltaPos;
 }
 
 unsigned int loadTexture(char const * path)
