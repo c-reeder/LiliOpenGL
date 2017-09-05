@@ -29,3 +29,8 @@ float Camera_2D::midX()
 {
 	return xpos + (displayWidth / 2.0f);
 }
+
+void Camera_2D::centerOn(float midX)
+{
+	xpos = midX - (displayWidth / 2.0f);
+}

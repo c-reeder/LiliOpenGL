@@ -174,19 +174,9 @@ int main()
 		glBindVertexArray(grassVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		// Update Game State
-		//if (gameState == BW && rightBarrier)
-		//{
-			//printf("Now going forward!\n");
-			//gameState = FW;
-		//} else if (FW && leftBarrier)
-		//{
-			//printf("Now going backward!\n");
-			//gameState = BW;
-		//}
 		
 		// Update Camera Position
-		if (gameState == BW)
+		if (gameState == BW && deltaPos < 0)
 		{
 			//if (camera.xpos - sprite->position.x > deltaPos * 2) {
 				//printf("1\n");
@@ -197,15 +187,21 @@ int main()
 				//camera.xpos = sprite->position.x;
 			//}
 
-			if (camera.midX() - sprite->midX() > deltaPos * 2) {
+			if (camera.midX() - sprite->midX() > deltaPos * -2.0f) {
 				printf("1\n");
-				camera.xpos = max(camera.xpos - 3000 * deltaTime,
-						sprite->position.x);
+				printf("camera.midX(): %f, sprite->midX(): %f\n", camera.midX(), sprite->midX());
+				printf("camera.midX() - sprite->midX(): %f, deltaPos: %f\n\n", camera.midX() - sprite->midX(), deltaPos);
+				//camera.xpos = max(camera.xpos - 3000 * deltaTime,
+						//sprite->position.x);
+				camera.centerOn(max(camera.midX() - 3000 * deltaTime,
+						sprite->midX()));
 			} else if (camera.midX() - sprite->midX() > 0) {
 				printf("2\n");
-				camera.xpos = sprite->midX() - (screenWidth / 2.0f);
+				printf("camera.midX(): %f, sprite->midX(): %f\n\n", camera.midX(), sprite->midX());
+				printf("camera.midX() - sprite->midX(): %f, deltaPos: %f\n\n", camera.midX() - sprite->midX(), deltaPos);
+				camera.centerOn(sprite->midX());
 			}
-		} else if (gameState == FW)
+		} else if (gameState == FW && deltaPos > 0)
 		{
 			//if (sprite->position.x - camera.xpos > deltaPos * 2) {
 				//printf("3\n");
@@ -218,17 +214,32 @@ int main()
 
 			//printf("sprite->midX(): %f, camera.midX(): %f\n",
 					//sprite->midX(), camera.midX());
-			if (sprite->midX() - camera.midX() > deltaPos * 2) {
-				//printf("3\n");
-				camera.xpos = min(3000 * deltaTime + camera.xpos,
-						sprite->position.x);
+			if (sprite->midX() - camera.midX() > deltaPos * 2.0f) {
+				printf("3\n");
+				//camera.xpos = min(3000 * deltaTime + camera.xpos,
+						//sprite->position.x);
+				camera.centerOn(min(3000 * deltaTime + camera.midX(),
+							sprite->midX()));
 			} else if (sprite->midX() - camera.midX() > 0) {
-				//printf("4\n");
-				camera.xpos = sprite->midX() - (screenWidth / 2.0f);
+				printf("4\n");
+				camera.centerOn(sprite->midX());
 			}
-		} else {
-			cerr << "Unknown game state!!!\n" << endl;
 		}
+
+		// Update Game State
+		//bool rightBarrier = sprite->position.x + sprite->width >=
+			//(camera.xpos + 3.0f * (screenWidth / 4.0f));
+		//bool leftBarrier = sprite->position.x <=
+			//(camera.xpos + (screenWidth / 4.0f));
+		//if (gameState == BW && rightBarrier)
+		//{
+			//printf("Now going forward!\n");
+			//gameState = FW;
+		//} else if (FW && leftBarrier)
+		//{
+			//printf("Now going backward!\n");
+			//gameState = BW;
+		//}
 
 		sprite->draw(gameState);
 		for (int i = 0; i < 5; i++)

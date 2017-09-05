@@ -15,6 +15,8 @@ class Camera_2D
 
 		void setSize(int width, int height);
 
+		void centerOn(float midX);
+
 		float midX();
 
 		glm::mat4 getViewMatrix();
