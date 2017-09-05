@@ -68,8 +68,8 @@ int main()
 
 	// Initialize Sprite
 	sprite = new Sprite(&camera, 0);
-	sprite->height = 250.0f / 2.0f;
-	sprite->width = 400.0f / 2.0f;
+	sprite->height = 250.0f / 4.0f;
+	sprite->width = 400.0f / 4.0f;
 	sprite->position = 
 		glm::vec2(screenWidth / 2.0f - sprite->width / 2.0f, 3.0f * (screenHeight / 4.0f) - sprite->height);
 
@@ -137,8 +137,6 @@ int main()
 
 	bool firstTime = true;
 
-	printf("whoa: sprite->position.x: %f, (camera.xpos + (screenWidth / 5.0f)): %f\n", sprite->position.x, (camera.xpos + (screenWidth / 5.0f)));
-
 	//camera.xpos = 435.0f;
 	while(!glfwWindowShouldClose(window))
 	{
@@ -179,50 +177,22 @@ int main()
 		// Update Camera Position
 		if (gameState == BW && deltaPos <= 0)
 		{
-			//if (camera.xpos - sprite->position.x > deltaPos * 2) {
-				//printf("1\n");
-				//camera.xpos = max(camera.xpos - 3000 * deltaTime,
-						//sprite->position.x);
-			//} else if (camera.xpos - sprite->position.x > 0) {
-				//printf("2\n");
-				//camera.xpos = sprite->position.x;
-			//}
-
 			if (camera.midX() - sprite->midX() > deltaPos * -2.0f) {
-				printf("1\n");
-				printf("camera.midX(): %f, sprite->midX(): %f\n", camera.midX(), sprite->midX());
-				printf("camera.midX() - sprite->midX(): %f, deltaPos: %f\n\n", camera.midX() - sprite->midX(), deltaPos);
-				//camera.xpos = max(camera.xpos - 3000 * deltaTime,
-						//sprite->position.x);
-				camera.centerOn(max(camera.midX() - 3000 * deltaTime,
+				//printf("1\n");
+				camera.centerOn(max(camera.midX() - 500 * deltaTime,
 						sprite->midX()));
 			} else if (camera.midX() - sprite->midX() > 0) {
-				printf("2\n");
-				printf("camera.midX(): %f, sprite->midX(): %f\n\n", camera.midX(), sprite->midX());
-				printf("camera.midX() - sprite->midX(): %f, deltaPos: %f\n\n", camera.midX() - sprite->midX(), deltaPos);
+				//printf("2\n");
 				camera.centerOn(sprite->midX());
 			}
 		} else if (gameState == FW && deltaPos >= 0)
 		{
-			//if (sprite->position.x - camera.xpos > deltaPos * 2) {
-				//printf("3\n");
-				//camera.xpos = min(3000 * deltaTime + camera.xpos,
-						//sprite->position.x);
-			//} else if (sprite->position.x - camera.xpos > 0) {
-				//printf("4\n");
-				//camera.xpos = sprite->position.x;
-			//}
-
-			//printf("sprite->midX(): %f, camera.midX(): %f\n",
-					//sprite->midX(), camera.midX());
 			if (sprite->midX() - camera.midX() > deltaPos * 2.0f) {
-				printf("3\n");
-				//camera.xpos = min(3000 * deltaTime + camera.xpos,
-						//sprite->position.x);
-				camera.centerOn(min(3000 * deltaTime + camera.midX(),
+				//printf("3\n");
+				camera.centerOn(min(500 * deltaTime + camera.midX(),
 							sprite->midX()));
 			} else if (sprite->midX() - camera.midX() > 0) {
-				printf("4\n");
+				//printf("4\n");
 				camera.centerOn(sprite->midX());
 			}
 		}
@@ -235,12 +205,10 @@ int main()
 		if (gameState == BW && rightBarrier)
 		{
 			printf("Now going forward!\n");
-			printf("sprite->position.x + sprite->width: %f, (camera.xpos + 4.0f * (screenWidth / 5.0f)): %f\n", sprite->position.x + sprite->position.x, (camera.xpos + 4.0f * (screenWidth / 5.0f)));
 			gameState = FW;
 		} else if (gameState == FW && leftBarrier)
 		{
 			printf("Now going backward!\n");
-			printf("sprite->position.x: %f, (camera.xpos + (screenWidth / 5.0f)): %f\n", sprite->position.x, (camera.xpos + (screenWidth / 5.0f)));
 			gameState = BW;
 		}
 
@@ -279,9 +247,9 @@ void processInput(GLFWwindow *window)
 	//if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		//position.y += deltaTime * 1000;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
-		deltaPos = -1000.0f * deltaTime;
+		deltaPos = -200.0f * deltaTime;
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		deltaPos = 1000.0f * deltaTime;
+		deltaPos = 200.0f * deltaTime;
 	else
 		deltaPos = 0.0f;
 	sprite->position.x += deltaPos;
