@@ -15,6 +15,8 @@ class Camera_2D
 
 		void setSize(int width, int height);
 
+		float midX();
+
 		glm::mat4 getViewMatrix();
 		glm::mat4 getProjectionMatrix();
 	private:

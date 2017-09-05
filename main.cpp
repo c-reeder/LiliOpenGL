@@ -71,7 +71,7 @@ int main()
 	sprite->height = 250.0f / 2.0f;
 	sprite->width = 400.0f / 2.0f;
 	sprite->position = 
-		glm::vec2(0.0f, 3.0f * (screenHeight / 4.0f) - sprite->height);
+		glm::vec2(screenWidth / 2.0f - sprite->width / 2.0f, 3.0f * (screenHeight / 4.0f) - sprite->height);
 
 	// Initialize Clouds
 	for (int i = 0; i < 5; i++)
@@ -135,6 +135,7 @@ int main()
 	int grassTexture = loadTexture("res/grass.png");
 	glBindTexture(GL_TEXTURE_2D, grassTexture);
 
+	bool firstTime = true;
 
 
 	//camera.xpos = 435.0f;
@@ -187,19 +188,43 @@ int main()
 		// Update Camera Position
 		if (gameState == BW)
 		{
-			if (camera.xpos - sprite->position.x > deltaPos * 2) {
+			//if (camera.xpos - sprite->position.x > deltaPos * 2) {
+				//printf("1\n");
+				//camera.xpos = max(camera.xpos - 3000 * deltaTime,
+						//sprite->position.x);
+			//} else if (camera.xpos - sprite->position.x > 0) {
+				//printf("2\n");
+				//camera.xpos = sprite->position.x;
+			//}
+
+			if (camera.midX() - sprite->midX() > deltaPos * 2) {
+				printf("1\n");
 				camera.xpos = max(camera.xpos - 3000 * deltaTime,
 						sprite->position.x);
-			} else if (camera.xpos - sprite->position.x > 0) {
-				camera.xpos = sprite->position.x;
+			} else if (camera.midX() - sprite->midX() > 0) {
+				printf("2\n");
+				camera.xpos = sprite->midX() - (screenWidth / 2.0f);
 			}
 		} else if (gameState == FW)
 		{
-			if (sprite->position.x - camera.xpos > deltaPos * 2) {
+			//if (sprite->position.x - camera.xpos > deltaPos * 2) {
+				//printf("3\n");
+				//camera.xpos = min(3000 * deltaTime + camera.xpos,
+						//sprite->position.x);
+			//} else if (sprite->position.x - camera.xpos > 0) {
+				//printf("4\n");
+				//camera.xpos = sprite->position.x;
+			//}
+
+			//printf("sprite->midX(): %f, camera.midX(): %f\n",
+					//sprite->midX(), camera.midX());
+			if (sprite->midX() - camera.midX() > deltaPos * 2) {
+				//printf("3\n");
 				camera.xpos = min(3000 * deltaTime + camera.xpos,
 						sprite->position.x);
-			} else if (sprite->position.x - camera.xpos > 0) {
-				camera.xpos = sprite->position.x;
+			} else if (sprite->midX() - camera.midX() > 0) {
+				//printf("4\n");
+				camera.xpos = sprite->midX() - (screenWidth / 2.0f);
 			}
 		} else {
 			cerr << "Unknown game state!!!\n" << endl;

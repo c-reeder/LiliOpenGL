@@ -24,3 +24,8 @@ glm::mat4 Camera_2D::getProjectionMatrix()
 {
 	return projectionMatrix;
 }
+
+float Camera_2D::midX()
+{
+	return xpos + (displayWidth / 2.0f);
+}

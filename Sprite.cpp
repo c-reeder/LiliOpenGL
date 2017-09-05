@@ -90,6 +90,11 @@ void Sprite::draw(Game_State state)
 }
 
 
+float Sprite::midX()
+{
+	return position.x + (width / 2.0f);
+}
+
 static unsigned int loadTexture(char const * path)
 {
 	unsigned int textureID;

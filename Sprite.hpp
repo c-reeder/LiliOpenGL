@@ -17,6 +17,8 @@ class Sprite
 		float width;
 		glm::vec2 position;
 
+		float midX();
+
 	private:
 		Camera_2D* camera;
 		Shader shader;
