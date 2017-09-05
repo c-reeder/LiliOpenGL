@@ -24,7 +24,7 @@ float Sprite::vertices[] = {
 	1.0f, 0.0f, 1.0f, 0.0f
 };
 
-Sprite::Sprite(Camera_2D* camera, int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f), width(400.0f), height(250.0f), lastTextureIdx(0), lastTextureSwitch(-0.15f)
+Sprite::Sprite(Camera_2D* camera, int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f), width(400.0f), height(250.0f), lastTextureIdx(3), lastTextureSwitch(-0.15f)
 {
 	this->camera = camera;
 	this->textureUnit = textureUnit;
@@ -44,30 +44,51 @@ Sprite::Sprite(Camera_2D* camera, int textureUnit) : shader("spriteVert.glsl", "
 	glEnableVertexAttribArray(0);
 
 	// Load Textures
-	textures[0] = loadTexture("res/LiliRunRight/lilirunright1.png");
-	textures[1] = loadTexture("res/LiliRunRight/lilirunright2.png");
-	textures[2] = loadTexture("res/LiliRunRight/lilirunright3.png");
-	textures[3] = loadTexture("res/LiliRunRight/lilirunright4.png");
+	rightTextures[0] = loadTexture("res/LiliRunRight/lilirunright1.png");
+	rightTextures[1] = loadTexture("res/LiliRunRight/lilirunright2.png");
+	rightTextures[2] = loadTexture("res/LiliRunRight/lilirunright3.png");
+	rightTextures[3] = loadTexture("res/LiliRunRight/lilirunright4.png");
+	rightTextures[4] = loadTexture("res/LiliRunRight/lilistandright.png");
 
+	leftTextures[0] = loadTexture("res/LiliRunLeft/lilirunleft1.png");
+	leftTextures[1] = loadTexture("res/LiliRunLeft/lilirunleft2.png");
+	leftTextures[2] = loadTexture("res/LiliRunLeft/lilirunleft3.png");
+	leftTextures[3] = loadTexture("res/LiliRunLeft/lilirunleft4.png");
+	leftTextures[4] = loadTexture("res/LiliRunLeft/lilistandleft.png");
 
 	int activeUnit = GL_TEXTURE0 + textureUnit;
 	glActiveTexture(activeUnit);
-	glBindTexture(GL_TEXTURE_2D, textures[lastTextureIdx]);
+	glBindTexture(GL_TEXTURE_2D, rightTextures[4]);
 	shader.use();
 }
 
-void Sprite::draw(Game_State state)
+void Sprite::draw(float deltaPos)
 {
 	float currentFrame = glfwGetTime();
 	shader.use();
 
-		//printf("currentFrame: %f, lastTextureSwitch: %f\n", currentFrame, lastTextureSwitch);
-	if (currentFrame - lastTextureSwitch > 0.15f) {
+	static float lastDeltaPos = 1.0f;
+
+	//printf("currentFrame: %f, lastTextureSwitch: %f\n", currentFrame, lastTextureSwitch);
+	if (deltaPos == 0.0f)
+	{
+		int activeUnit = GL_TEXTURE0 + textureUnit;
+		glActiveTexture(activeUnit);
+		lastTextureIdx = 3;
+		if (lastDeltaPos > 0.0f)
+			glBindTexture(GL_TEXTURE_2D, rightTextures[4]);
+		else if (lastDeltaPos < 0.0f)
+			glBindTexture(GL_TEXTURE_2D, leftTextures[4]);
+	} else if (currentFrame - lastTextureSwitch > 0.15f) {
 		int activeUnit = GL_TEXTURE0 + textureUnit;
 		glActiveTexture(activeUnit);
 		lastTextureIdx = (lastTextureIdx + 1) % 4;
-		glBindTexture(GL_TEXTURE_2D, textures[lastTextureIdx]);
+		if (deltaPos > 0.0f)
+			glBindTexture(GL_TEXTURE_2D, rightTextures[lastTextureIdx]);
+		else if (deltaPos < 0.0f)
+			glBindTexture(GL_TEXTURE_2D, leftTextures[lastTextureIdx]);
 		lastTextureSwitch = currentFrame;
+		lastDeltaPos = deltaPos;
 	} else if (currentFrame < lastTextureSwitch) {
 		std::cerr << "WHOAAA!!!" << std::endl;
 	}

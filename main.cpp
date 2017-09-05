@@ -212,7 +212,7 @@ int main()
 			gameState = BW;
 		}
 
-		sprite->draw(gameState);
+		sprite->draw(deltaPos);
 		for (int i = 0; i < 5; i++)
 		{
 			clouds[i]->draw();

@@ -11,7 +11,7 @@ class Sprite
 {
 	public:
 		Sprite(Camera_2D* camera, int textureUnit);
-		void draw(Game_State state);
+		void draw(float deltaPos);
 
 		float height;
 		float width;
@@ -25,7 +25,8 @@ class Sprite
 		unsigned int VAO;
 		int textureUnit;
 		static float vertices[];
-		int textures[4];
+		int leftTextures[5];
+		int rightTextures[5];
 		float lastTextureSwitch;
 		int lastTextureIdx;
 
