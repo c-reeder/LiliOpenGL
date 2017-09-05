@@ -3,7 +3,7 @@ CXX=g++
 CPPFLAGS=-std=c++11 -g
 LDLIBS=-lglfw -lGLEW -lGL -lSOIL
 ODIR=objs
-TOOLS=Shader Sprite Object Camera_2D
+TOOLS=Shader Sprite Object Camera_2D ObjectRenderer
 OBJS=$(TOOLS:%=$(ODIR)/%.o)
 SHADERS=spriteVert.glsl spriteFrag.glsl
 

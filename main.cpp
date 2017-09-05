@@ -177,21 +177,21 @@ int main()
 		if (gameState == BW && deltaPos <= 0 && camera.xpos != 0.0f)
 		{
 			if (camera.midX() - sprite->midX() > deltaPos * -2.0f) {
-				printf("1\n");
+				//printf("1\n");
 				camera.centerOn(max(camera.midX() - 500 * deltaTime,
 						sprite->midX()));
 			} else if (camera.midX() - sprite->midX() > 0) {
-				printf("2\n");
+				//printf("2\n");
 				camera.centerOn(sprite->midX());
 			}
 		} else if (gameState == FW && deltaPos >= 0 && camera.xpos != levelLength - screenWidth)
 		{
 			if (sprite->midX() - camera.midX() > deltaPos * 2.0f) {
-				printf("3\n");
+				//printf("3\n");
 				camera.centerOn(min(500 * deltaTime + camera.midX(),
 							sprite->midX()));
 			} else if (sprite->midX() - camera.midX() > 0) {
-				printf("4\n");
+				//printf("4\n");
 				camera.centerOn(sprite->midX());
 			}
 		}
@@ -255,11 +255,11 @@ void processInput(GLFWwindow *window)
 
 	if (sprite->position.x < 0.0f) {
 		sprite->position.x = 0.0f;
-		printf("Went past the start!\n");
+		//printf("Went past the start!\n");
 	}
 	if (sprite->position.x > levelLength - sprite->width) {
 		sprite->position.x = levelLength - sprite->width;
-		printf("Went off the end!\n");
+		//printf("Went off the end!\n");
 	}
 }
 

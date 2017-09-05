@@ -1,6 +1,3 @@
-/**
- * A class which represents a single object within the game.
- */
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,12 +6,31 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Object.hpp"
 #include "Shader.hpp"
+#include "Camera_2D.hpp"
 
-static unsigned int loadTexture(char const * path, int* imgWidth, int* imgHeight);
 
-float Object::vertices[] = { 
+class ObjectRenderer
+{
+	public:
+		ObjectRenderer(Camera_2D* camera,
+				char const* imgPath, int textureUnit);
+
+		void drawObject(float xPos, float yPos,
+				float width, float height);
+
+	private:
+		int textureUnit;
+		Shader shader;
+		unsigned int VAO;
+		Camera_2D* camera;
+		static float vertices[];
+		int texture;
+};
+
+static unsigned int loadTexture(char const * path);
+
+float ObjectRenderer::vertices[] = { 
 	// Pos      // Tex
 	0.0f, 1.0f, 0.0f, 1.0f,
 	1.0f, 0.0f, 1.0f, 0.0f,
@@ -25,7 +41,8 @@ float Object::vertices[] = {
 	1.0f, 0.0f, 1.0f, 0.0f
 };
 
-Object::Object(Camera_2D* camera, char const* imagePath, int textureUnit) : shader("spriteVert.glsl", "spriteFrag.glsl"), position(0.0f, 0.0f) 
+ObjectRenderer::ObjectRenderer(Camera_2D* camera,
+		char const* imgPath, int textureUnit) : shader("objectVert.glsl", "objectFrag.glsl")
 {
 	this->camera = camera;
 	this->textureUnit = textureUnit;
@@ -34,8 +51,8 @@ Object::Object(Camera_2D* camera, char const* imagePath, int textureUnit) : shad
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Object::vertices),
-			Object::vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
+			vertices, GL_STATIC_DRAW);
 
 	// Create Vertex Array Object
 	glGenVertexArrays(1, &VAO);
@@ -45,53 +62,37 @@ Object::Object(Camera_2D* camera, char const* imagePath, int textureUnit) : shad
 	glEnableVertexAttribArray(0);
 
 	// Load Image Texture
-	int imgWidth;
-	int imgHeight;
-	texture = loadTexture(imagePath, &imgWidth, &imgHeight);
-
-	// Set Default dimmensions of Object to the dimensions of image
-	this->width = imgWidth;
-	this->height = imgHeight;
+	texture = loadTexture(imgPath);
 
 	int activeUnit = GL_TEXTURE0 + textureUnit;
 	glActiveTexture(activeUnit);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	shader.use();
+
+	shader.set1i("image", textureUnit);
 }
 
-void Object::draw()
+void ObjectRenderer::drawObject(float xPos, float yPos, float width, float height)
 {
-	float currentFrame = glfwGetTime();
-	shader.use();
-
-	// Activate Texture
-	int activeUnit = GL_TEXTURE0 + textureUnit;
-	glActiveTexture(activeUnit);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
 	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(position, 0.0f));
+	model = glm::translate(model, glm::vec3(xPos, yPos, 0.0f));
 	model = glm::scale(model, glm::vec3(width, height, 1.0f));
-
 
 	shader.setMatrix4fv("model", model);
 	shader.setMatrix4fv("view", camera->getViewMatrix());
 	shader.setMatrix4fv("projection", camera->getProjectionMatrix());
-	shader.set1i("image", textureUnit);
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
 }
 
-
-static unsigned int loadTexture(char const * path, int* imgWidth, int* imgHeight)
+static unsigned int loadTexture(char const * path)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
+	int imgWidth, imgHeight;
 	unsigned char* data = SOIL_load_image(path,
-			imgWidth, imgHeight, 0, SOIL_LOAD_RGBA);
+			&imgWidth, &imgHeight, 0, SOIL_LOAD_RGBA);
 	if( 0 == data )
 	{
 		printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
@@ -99,7 +100,7 @@ static unsigned int loadTexture(char const * path, int* imgWidth, int* imgHeight
 
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *imgWidth, *imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
