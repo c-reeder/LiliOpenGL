@@ -137,7 +137,6 @@ int main()
 
 	bool firstTime = true;
 
-	//camera.xpos = 435.0f;
 	while(!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -204,11 +203,11 @@ int main()
 			(camera.xpos + (screenWidth / 5.0f));
 		if (gameState == BW && rightBarrier)
 		{
-			printf("Now going forward!\n");
+			//printf("Now going forward!\n");
 			gameState = FW;
 		} else if (gameState == FW && leftBarrier)
 		{
-			printf("Now going backward!\n");
+			//printf("Now going backward!\n");
 			gameState = BW;
 		}
 
@@ -253,6 +252,15 @@ void processInput(GLFWwindow *window)
 	else
 		deltaPos = 0.0f;
 	sprite->position.x += deltaPos;
+
+	if (sprite->position.x < 0.0f) {
+		sprite->position.x = 0.0f;
+		printf("Went past the start!\n");
+	}
+	if (sprite->position.x > levelLength - sprite->width) {
+		sprite->position.x = levelLength - sprite->width;
+		printf("Went off the end!\n");
+	}
 }
 
 unsigned int loadTexture(char const * path)
