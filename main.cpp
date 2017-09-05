@@ -28,7 +28,7 @@ float deltaTime = 0.0f;
 float deltaPos = 0.0f;
 float lastFrame = 0.0f;
 
-Camera_2D camera(screenWidth, screenHeight);
+Camera_2D camera(screenWidth, screenHeight, levelLength);
 
 Sprite* sprite = NULL;
 Object* clouds[5];
@@ -174,24 +174,24 @@ int main()
 
 		
 		// Update Camera Position
-		if (gameState == BW && deltaPos <= 0)
+		if (gameState == BW && deltaPos <= 0 && camera.xpos != 0.0f)
 		{
 			if (camera.midX() - sprite->midX() > deltaPos * -2.0f) {
-				//printf("1\n");
+				printf("1\n");
 				camera.centerOn(max(camera.midX() - 500 * deltaTime,
 						sprite->midX()));
 			} else if (camera.midX() - sprite->midX() > 0) {
-				//printf("2\n");
+				printf("2\n");
 				camera.centerOn(sprite->midX());
 			}
-		} else if (gameState == FW && deltaPos >= 0)
+		} else if (gameState == FW && deltaPos >= 0 && camera.xpos != levelLength - screenWidth)
 		{
 			if (sprite->midX() - camera.midX() > deltaPos * 2.0f) {
-				//printf("3\n");
+				printf("3\n");
 				camera.centerOn(min(500 * deltaTime + camera.midX(),
 							sprite->midX()));
 			} else if (sprite->midX() - camera.midX() > 0) {
-				//printf("4\n");
+				printf("4\n");
 				camera.centerOn(sprite->midX());
 			}
 		}

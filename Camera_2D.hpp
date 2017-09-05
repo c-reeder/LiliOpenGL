@@ -5,10 +5,12 @@
 class Camera_2D
 {
 	public:
-		Camera_2D(float displayWidth, float displayHeight);
+		Camera_2D(float displayWidth, float displayHeight,
+				float worldLength);
 
 		float displayWidth;
 		float displayHeight;
+		float worldLength;
 
 		float xpos;
 

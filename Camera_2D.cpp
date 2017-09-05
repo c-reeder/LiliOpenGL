@@ -1,10 +1,11 @@
 #include "Camera_2D.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera_2D::Camera_2D(float displayWidth, float displayHeight) : xpos(0.0f)
+Camera_2D::Camera_2D(float displayWidth, float displayHeight, float worldLength) : xpos(0.0f)
 {
 	this->displayWidth = displayWidth;
 	this->displayHeight = displayHeight;
+	this->worldLength = worldLength;
 
 	projectionMatrix = glm::ortho(0.0f, displayWidth, displayHeight, 0.0f, -1.0f, 1.0f);  
 }
@@ -32,5 +33,10 @@ float Camera_2D::midX()
 
 void Camera_2D::centerOn(float midX)
 {
-	xpos = midX - (displayWidth / 2.0f);
+	float potX = midX - (displayWidth / 2.0f);
+	if (potX < 0.0f)
+		potX = 0.0f;
+	if (potX > worldLength - displayWidth)
+		potX = worldLength - displayWidth;
+	xpos = potX;
 }
