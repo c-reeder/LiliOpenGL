@@ -6,27 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Shader.hpp"
-#include "Camera_2D.hpp"
-
-
-class ObjectRenderer
-{
-	public:
-		ObjectRenderer(Camera_2D* camera,
-				char const* imgPath, int textureUnit);
-
-		void drawObject(float xPos, float yPos,
-				float width, float height);
-
-	private:
-		int textureUnit;
-		Shader shader;
-		unsigned int VAO;
-		Camera_2D* camera;
-		static float vertices[];
-		int texture;
-};
+#include "ObjectRenderer.hpp"
 
 static unsigned int loadTexture(char const * path);
 
@@ -68,11 +48,13 @@ ObjectRenderer::ObjectRenderer(Camera_2D* camera,
 	glActiveTexture(activeUnit);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
+	shader.use();
 	shader.set1i("image", textureUnit);
 }
 
 void ObjectRenderer::drawObject(float xPos, float yPos, float width, float height)
 {
+	shader.use();
 	glm::mat4 model;
 	model = glm::translate(model, glm::vec3(xPos, yPos, 0.0f));
 	model = glm::scale(model, glm::vec3(width, height, 1.0f));

@@ -1,16 +1,19 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include "Shader.hpp"
-#include "Sprite.hpp"
 #include <SOIL/SOIL.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
+
+#include "Shader.hpp"
+#include "Sprite.hpp"
 #include "Game.hpp"
 #include "Object.hpp"
 #include "Camera_2D.hpp"
+#include "ObjectRenderer.hpp"
 
 using namespace std;
 
@@ -31,7 +34,9 @@ float lastFrame = 0.0f;
 Camera_2D camera(screenWidth, screenHeight, levelLength);
 
 Sprite* sprite = NULL;
-Object* clouds[5];
+//Object* clouds[5];
+ObjectRenderer* cloudRenderer = NULL;
+
 
 
 Game_State gameState;
@@ -71,23 +76,10 @@ int main()
 	sprite->height = 250.0f / 4.0f;
 	sprite->width = 400.0f / 4.0f;
 	sprite->position = 
-		glm::vec2(screenWidth / 2.0f - sprite->width / 2.0f, 3.0f * (screenHeight / 4.0f) - sprite->height);
+		glm::vec2(0.0f , 3.0f * (screenHeight / 4.0f) - sprite->height);
 
 	// Initialize Clouds
-	for (int i = 0; i < 5; i++)
-	{
-
-		clouds[i] = new Object(&camera, "res/cloud.png", 2);
-		clouds[i]->height = 250.0f / 2.0f;
-		clouds[i]->width = 400.0f / 2.0f;
-		clouds[i]->position.x = i * 300.0f;
-
-	}
-	//cloud = new Object(&camera, "res/cloud.png", 2);
-	//cloud->height = 250.0f / 2.0f;
-	//cloud->width = 400.0f / 2.0f;
-	//cloud->position.x = 200.0f;
-
+	cloudRenderer = new ObjectRenderer(&camera, "res/cloud.png", 2);
 
 	float texWide = screenWidth / 32.0f;
 	float texHigh = (screenHeight / 4.0f) / 32.0f;
@@ -128,7 +120,7 @@ int main()
 	 * ------------------------
 	 * 0 - Sprite Image
 	 * 1 - Grass Image
-	 *
+	 * 2 - Cloud Image
 	 */
 
 	glActiveTexture(GL_TEXTURE1);
@@ -212,10 +204,15 @@ int main()
 		}
 
 		sprite->draw(deltaPos);
-		for (int i = 0; i < 5; i++)
+		
+		for (int i = 0; i < 54; i++)
 		{
-			clouds[i]->draw();
+			cloudRenderer->drawObject(300.0f * i, 0.0f,
+					400.0f / 2.0f, 250.0f / 2.0f);
 		}
+		//clouds[i]->height = 250.0f / 2.0f;
+		//clouds[i]->width = 400.0f / 2.0f;
+		//clouds[i]->position.x = i * 300.0f;
 		//cloud->draw();
 
 		glfwPollEvents();

@@ -9,6 +9,9 @@ class ObjectRenderer
 		ObjectRenderer(Camera_2D* camera,
 				char const* imgPath, int textureUnit);
 
+		void drawObject(float xPos, float yPos,
+				float width, float height);
+
 	private:
 		int textureUnit;
 		Shader shader;
