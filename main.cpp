@@ -64,7 +64,7 @@ int main()
 
 	Shader grassShader("spriteVert.glsl", "spriteFrag.glsl");
 
-	gameState = FW;
+	gameState = BW;
 
 	// Initialize Sprite
 	sprite = new Sprite(&camera, 0);
@@ -137,6 +137,7 @@ int main()
 
 	bool firstTime = true;
 
+	printf("whoa: sprite->position.x: %f, (camera.xpos + (screenWidth / 5.0f)): %f\n", sprite->position.x, (camera.xpos + (screenWidth / 5.0f)));
 
 	//camera.xpos = 435.0f;
 	while(!glfwWindowShouldClose(window))
@@ -176,7 +177,7 @@ int main()
 
 		
 		// Update Camera Position
-		if (gameState == BW && deltaPos < 0)
+		if (gameState == BW && deltaPos <= 0)
 		{
 			//if (camera.xpos - sprite->position.x > deltaPos * 2) {
 				//printf("1\n");
@@ -201,7 +202,7 @@ int main()
 				printf("camera.midX() - sprite->midX(): %f, deltaPos: %f\n\n", camera.midX() - sprite->midX(), deltaPos);
 				camera.centerOn(sprite->midX());
 			}
-		} else if (gameState == FW && deltaPos > 0)
+		} else if (gameState == FW && deltaPos >= 0)
 		{
 			//if (sprite->position.x - camera.xpos > deltaPos * 2) {
 				//printf("3\n");
@@ -227,19 +228,21 @@ int main()
 		}
 
 		// Update Game State
-		//bool rightBarrier = sprite->position.x + sprite->width >=
-			//(camera.xpos + 3.0f * (screenWidth / 4.0f));
-		//bool leftBarrier = sprite->position.x <=
-			//(camera.xpos + (screenWidth / 4.0f));
-		//if (gameState == BW && rightBarrier)
-		//{
-			//printf("Now going forward!\n");
-			//gameState = FW;
-		//} else if (FW && leftBarrier)
-		//{
-			//printf("Now going backward!\n");
-			//gameState = BW;
-		//}
+		bool rightBarrier = sprite->position.x + sprite->width >=
+			(camera.xpos + 4.0f * (screenWidth / 5.0f));
+		bool leftBarrier = sprite->position.x <=
+			(camera.xpos + (screenWidth / 5.0f));
+		if (gameState == BW && rightBarrier)
+		{
+			printf("Now going forward!\n");
+			printf("sprite->position.x + sprite->width: %f, (camera.xpos + 4.0f * (screenWidth / 5.0f)): %f\n", sprite->position.x + sprite->position.x, (camera.xpos + 4.0f * (screenWidth / 5.0f)));
+			gameState = FW;
+		} else if (gameState == FW && leftBarrier)
+		{
+			printf("Now going backward!\n");
+			printf("sprite->position.x: %f, (camera.xpos + (screenWidth / 5.0f)): %f\n", sprite->position.x, (camera.xpos + (screenWidth / 5.0f)));
+			gameState = BW;
+		}
 
 		sprite->draw(gameState);
 		for (int i = 0; i < 5; i++)
