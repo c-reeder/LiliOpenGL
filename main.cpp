@@ -15,6 +15,8 @@
 #include "Camera_2D.hpp"
 #include "ObjectRenderer.hpp"
 
+#define GROUND ((screenHeight / 4.0f) * 3.0f)
+
 using namespace std;
 
 void processInput(GLFWwindow *window);
@@ -38,6 +40,9 @@ Sprite* sprite = NULL;
 ObjectRenderer* cloudRenderer = NULL;
 
 
+const float JUMP_TIME = 0.25f;
+float jumpStart = 0;
+bool jumping = false;
 
 Game_State gameState;
 
@@ -76,7 +81,7 @@ int main()
 	sprite->height = 250.0f / 4.0f;
 	sprite->width = 400.0f / 4.0f;
 	sprite->position = 
-		glm::vec2(0.0f , 3.0f * (screenHeight / 4.0f) - sprite->height);
+		glm::vec2(0.0f , GROUND - sprite->height);
 
 	// Initialize Clouds
 	cloudRenderer = new ObjectRenderer(&camera, "res/cloud.png", 2);
@@ -129,6 +134,7 @@ int main()
 
 	bool firstTime = true;
 
+
 	while(!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -137,6 +143,14 @@ int main()
 
 
 		processInput(window);
+
+		if (jumping) {
+			if (currentFrame - jumpStart < JUMP_TIME) {
+				sprite->position.y -= deltaTime * 200.0f;
+			} else {
+				jumping = false;
+			}
+		}
 
 		glClearColor(0.82f, 0.52f, 0.93f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -238,8 +252,12 @@ void processInput(GLFWwindow *window)
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	//if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		//position.y -= deltaTime * 1000;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		if (!jumping && (sprite->position.y + sprite->height >= GROUND)) {
+			jumping = true;
+			jumpStart = glfwGetTime();
+		}
+	}
 	//if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		//position.y += deltaTime * 1000;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
@@ -258,6 +276,10 @@ void processInput(GLFWwindow *window)
 		sprite->position.x = levelLength - sprite->width;
 		//printf("Went off the end!\n");
 	}
+	if (!jumping)
+		if (sprite->position.y + sprite->height < GROUND) {
+			sprite->position.y += 200.0f * deltaTime;
+		}
 }
 
 unsigned int loadTexture(char const * path)
